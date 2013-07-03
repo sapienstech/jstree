@@ -35,8 +35,15 @@
 		create : function (el, options) {
 			// create the new core
 			var tmp = new $.jstree.core(++instance_counter);
+			
+			var originalOptionsJson = options.json;
+			
 			// extend options with the defaults
 			options = $.extend(true, {}, $.jstree.defaults, options);
+
+			//set back the original json to keep refernce, beacue true in $.extend will create deep copy which will clone the object
+			options.json = originalOptionsJson; 
+
 			// each option key except 'core' represents a plugin to be loaded
 			$.each(options.plugins, function (i, k) {
 				if(i !== 'core') {
@@ -827,7 +834,9 @@
 			li	= $("<li />").attr(node.li_attr);
 			a	= $("<a />").attr(node.a_attr).html(node.title);
 			ul	= $("<ul />");
-			if(node.data && !$.isEmptyObject(node.data)) { li.data(node.data); }
+			if(node.data && !$.isEmptyObject(node.data)) { 
+				li.data("nodeModel", node.data); 
+			}
 			if(
 				node.children === true ||
 				$.isArray(node.children) ||
@@ -2626,7 +2635,7 @@ This plugin makes it possible for jstree to use JSON data sources.
 		};
 		this._load_node = function (obj, callback) {
 			var d = false,
-				s = $.extend(true, {}, this.settings.json);
+				s = $.extend({}, this.settings.json);
 			obj = this.get_node(obj);
 			if(!obj) { return false; }
 
@@ -3062,7 +3071,7 @@ This plugin enables state saving between reloads.
 	};
 
 	// include the state plugin by default
-	$.jstree.defaults.plugins.push("state");
+	//$.jstree.defaults.plugins.push("state");
 })(jQuery);
 
 (function ($, document, undefined) {
